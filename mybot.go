@@ -62,6 +62,9 @@ func main() {
 					postMessage(ws, m)
 				}(m)
 				// NOTE: the Message object is copied, this is intentional
+			} else if parts[1] == "info" {
+				m.Text = fmt.Sprintf("Welcome to gostock! I love pizza! Look up a stock price by using the command: '@gostock stock (your stock symbols)'")
+				postMessage(ws, m)
 			} else {
 				// huh?
 				m.Text = fmt.Sprintf("sorry, that does not compute\n")
