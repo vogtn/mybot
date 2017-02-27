@@ -55,15 +55,21 @@ func main() {
 		if m.Type == "message" && strings.HasPrefix(m.Text, "<@"+id+">") {
 			// if so try to parse if
 			parts := strings.Fields(m.Text)
-			if len(parts) == 3 && parts[1] == "stock" {
+			if len(parts) == 3 && parts[1] == "quote" {
 				// looks good, get the quote and reply with the result
 				go func(m Message) {
 					m.Text = getQuote(parts[2])
 					postMessage(ws, m)
 				}(m)
 				// NOTE: the Message object is copied, this is intentional
-			} else if parts[1] == "info" {
-				m.Text = fmt.Sprintf("Welcome to gostock! I love pizza! Look up a stock price by using the command: '@gostock stock (your stock symbols)'")
+			} else if parts[1] == "hi" {
+				m.Text = fmt.Sprintf("Welcome to gostock! I love pizza! Look up a stock price by using the commands: '@gostock quote (your stock symbol)'")
+				postMessage(ws, m)
+			} else if parts[1] == "buy" && len(parts) == 3 {
+				m.Text = fmt.Sprintf("You want to buy: " + parts[2])
+				postMessage(ws, m)
+			} else if parts[1] == "updateStocks" {
+				m.Text = fmt.Sprintf("You have updated the stocks in the DB")
 				postMessage(ws, m)
 			} else {
 				// huh?
@@ -74,8 +80,6 @@ func main() {
 	}
 }
 
-// Get the quote via Yahoo. You should replace this method to something
-// relevant to your team!
 func getQuote(sym string) string {
 	sym = strings.ToUpper(sym)
 	url := fmt.Sprintf("http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nsl1op&e=.csv", sym)
