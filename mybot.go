@@ -26,12 +26,16 @@ THE SOFTWARE.
 package main
 
 import (
+	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -66,7 +70,29 @@ func main() {
 				m.Text = fmt.Sprintf("Welcome to gostock! I love pizza! Look up a stock price by using the commands: '@gostock quote (your stock symbol)'")
 				postMessage(ws, m)
 			} else if parts[1] == "buy" && len(parts) == 3 {
-				m.Text = fmt.Sprintf("You want to buy: " + parts[2])
+
+				m.Text = fmt.Sprintf("You want to buy: " + parts[2] + " " + getQuote(parts[2]))
+				var sStmt string = "insert into stock (stock_id, stock_price, created) values ($1, $2, $3)"
+				db, err := sql.Open("postgres", "host=localhost dbname=stock sslmode=disable")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				stmt, err := db.Prepare(sStmt)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Printf("StartTime: %v\n", time.Now())
+
+				res, err := stmt.Exec(parts[2], 10, time.Now())
+				if err != nil || res == nil {
+					log.Fatal(err)
+				}
+				stmt.Close()
+				db.Close()
+
+				fmt.Printf("StopTime: %v\n", time.Now())
 				postMessage(ws, m)
 			} else if parts[1] == "updateStocks" {
 				m.Text = fmt.Sprintf("You have updated the stocks in the DB")
