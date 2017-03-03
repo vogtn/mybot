@@ -85,7 +85,7 @@ func main() {
 
 				fmt.Printf("StartTime: %v\n", time.Now())
 
-				res, err := stmt.Exec(parts[2], 10, time.Now())
+				res, err := stmt.Exec(parts[2], getQuote(parts[2]), time.Now())
 				if err != nil || res == nil {
 					log.Fatal(err)
 				}
