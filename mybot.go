@@ -83,19 +83,13 @@ func main() {
 					log.Fatal(err)
 				}
 
-				fmt.Printf("StartTime: %v\n", time.Now())
-
-				res, err := stmt.Exec(parts[2], getQuote(parts[2]), time.Now())
+				res, err := stmt.Exec(parts[2], getPrice(parts[2]), time.Now())
 				if err != nil || res == nil {
 					log.Fatal(err)
 				}
 				stmt.Close()
 				db.Close()
 
-				fmt.Printf("StopTime: %v\n", time.Now())
-				postMessage(ws, m)
-			} else if parts[1] == "updateStocks" {
-				m.Text = fmt.Sprintf("You have updated the stocks in the DB")
 				postMessage(ws, m)
 			} else {
 				// huh?
@@ -119,6 +113,23 @@ func getQuote(sym string) string {
 	}
 	if len(rows) >= 1 && len(rows[0]) == 5 {
 		return fmt.Sprintf("%s (%s) is trading at $%s", rows[0][0], rows[0][1], rows[0][2])
+	}
+	return fmt.Sprintf("unknown response format (symbol was \"%s\")", sym)
+}
+
+func getPrice(sym string) string {
+	sym = strings.ToUpper(sym)
+	url := fmt.Sprintf("http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nsl1op&e=.csv", sym)
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Sprintf("error: %v", err)
+	}
+	rows, err := csv.NewReader(resp.Body).ReadAll()
+	if err != nil {
+		return fmt.Sprintf("error: %v", err)
+	}
+	if len(rows) >= 1 && len(rows[0]) == 5 {
+		return fmt.Sprintf("%s", rows[0][2])
 	}
 	return fmt.Sprintf("unknown response format (symbol was \"%s\")", sym)
 }
