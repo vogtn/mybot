@@ -72,7 +72,7 @@ func main() {
 			} else if parts[1] == "buy" && len(parts) == 3 {
 
 				m.Text = fmt.Sprintf("You want to buy: " + parts[2] + " " + getQuote(parts[2]))
-				var sStmt string = "insert into stock (stock_id, stock_price, created) values ($1, $2, $3)"
+				var sStmt string = "insert into portfolios (stock_id, stock_price, date) values ($1, $2, $3)"
 				db, err := sql.Open("postgres", "host=localhost dbname=stock sslmode=disable")
 				if err != nil {
 					log.Fatal(err)
