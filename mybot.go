@@ -1,27 +1,4 @@
-/*
 
-mybot - Illustrative Slack bot in Go
-
-Copyright (c) 2015 RapidLoop
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
 
 package main
 
@@ -35,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func main() {
@@ -73,7 +50,10 @@ func main() {
 
 				m.Text = fmt.Sprintf("You want to buy: " + parts[2] + " " + getQuote(parts[2]))
 				var sStmt string = "insert into portfolios (stock_id, stock_price, date) values ($1, $2, $3)"
-				db, err := sql.Open("postgres", "host=localhost dbname=stock sslmode=disable")
+				    url := "postgres://dnnzypcfamjdvv:81109122c1678fcb5290bc0e3267de8aa77ba58813dabe6697e7455fc4a9f30e@ec2-54-225-104-61.compute-1.amazonaws.com:5432/ddei9gtbsqf3tl"
+					connection, _ := pq.ParseURL(url)
+					connection += " sslmode=require"
+				db, err := sql.Open("postgres", connection)
 				if err != nil {
 					log.Fatal(err)
 				}
